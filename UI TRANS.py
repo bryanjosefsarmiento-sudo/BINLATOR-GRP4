@@ -1,6 +1,6 @@
 # Import necessary modules from Python and PyQt5
 import sys
-import re  # <-- added for normalize_mode
+import re  # <-- used by normalize_mode
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QPushButton, QComboBox,
     QTextEdit, QMessageBox, QTextBrowser
@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
         # Load the .ui file (created using Qt Designer)
         uic.loadUi("CUNT.ui", self)
         self.setWindowTitle("BINLATOR")          # Set window title
-        self.setWindowIcon(QIcon("Logo.jpg"))    # Set window icon (optional)
+        self.setWindowIcon(QIcon("Logo.jpg"))    # Set window icon 
 
         #  Connect Python to widgets made in Qt Designer 
         # Find each widget by its "objectName" (set in Qt Designer)
@@ -52,27 +52,75 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
             self.copy_button.clicked.connect(self.copy_output)  # Runs copy_output() when clicked
 
         #  Dictionary linking dropdown modes to backend functions 
-        #  (shortened labels to avoid truncation, and kept a consistent pattern)
         self.fn_map = {
             "Text - Unicode/ASCII": bryan.text_to_unicode,
             "Text - Binary": bryan.text_to_binary,
             "Text - Hexadecimal": bryan.text_to_hex,
 
-            "Binary - Text": bryan.binary_to_text,
-            "Binary - Unicode/ASCII": bryan.binary_to_unicode,
-            "Binary - Hexadecimal": bryan.binary_to_hex,
+            "Binary (ASCII Bytes) - Text": bryan.binary_to_text,
+            "Binary (ASCII Bytes) - Unicode/ASCII": bryan.binary_to_unicode,
+            "Binary (ASCII Bytes) - Hexadecimal": bryan.binary_to_hex,
 
             "Unicode/ASCII - Text": bryan.unicode_to_text,
             "Unicode/ASCII - Binary": bryan.unicode_to_binary,
-            "Unicode/ASCII - Hexadecimal": bryan.decimal_to_hex,   # renamed
+            "Unicode/ASCII - Hexadecimal": bryan.decimal_to_hex,   
 
             "Hexadecimal - Text": bryan.hex_to_text,
-            "Hexadecimal - Unicode/ASCII": bryan.hex_to_decimal,   # renamed
+            "Hexadecimal - Unicode/ASCII": bryan.hex_to_decimal,   
             "Hexadecimal - Binary": bryan.hex_to_binary,
         }
 
         # Build a normalized lookup so small spacing/dash differences don’t break things
         self.fn_map_norm = {normalize_mode(k): v for k, v in self.fn_map.items()}
+
+    # -----------------------------
+    # UI helper: group binary input
+    # -----------------------------
+    def _group_binary_8(self, raw: str):
+        """
+        Take whatever is in the input box and:
+          1) keep only 0 and 1 (ignore spaces/other chars),
+          2) ensure total length is a multiple of 8,
+          3) return a string grouped into 8-bit chunks separated by spaces,
+             e.g. "0100100001101001" -> "01001000 01101001".
+        Returns None if invalid (backend will handle errors later).
+        """
+        if raw is None:
+            return None
+
+        # (1) Keep only '0' and '1' — ignore any spaces the user added.
+        cleaned = ""
+        for ch in raw:
+            if ch == "0" or ch == "1":
+                cleaned += ch
+            # ignore spaces or any other characters, we don't keep them
+
+        # (2) Must be non-empty and a multiple of 8 (1 byte per character)
+        if len(cleaned) == 0 or (len(cleaned) % 8) != 0:
+            return None  # let the backend raise a user-friendly error message
+
+        # (3) Build 8-bit groups using a simple counter 
+        groups = []
+        current = ""
+        for bit in cleaned:
+            current += bit
+            if len(current) == 8:
+                groups.append(current)
+                current = ""
+
+        if current:  # shouldn't happen if len % 8 == 0, but be safe
+            return None
+
+        # Join groups with single spaces
+        grouped = ""
+        i = 0
+        while i < len(groups):
+            grouped += groups[i]
+            if i != len(groups) - 1:
+                grouped += " "
+            i += 1
+
+        return grouped
 
     #  Function: Clear the interface 
     def clear(self):
@@ -115,6 +163,16 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
 
         # Get whatever text the user typed in the input box
         user_input = self.text_1.toPlainText()
+
+        # ✅ AUTO-SPACING STEP (UI-side convenience, backend unchanged)
+        # Only do this when the selected mode is one of the Binary modes.
+        if mode.startswith("Binary"):
+            grouped = self._group_binary_8(user_input)
+            if grouped is not None:
+                # Update the input box to the neatly spaced 8-bit form so the user sees it.
+                self.text_1.setPlainText(grouped)
+                user_input = grouped
+            # If grouped is None, we leave the input as-is; backend will return a clear error.
 
         # Look up the correct backend function based on dropdown choice (normalized)
         func = self.fn_map_norm.get(mode)
@@ -164,4 +222,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-#bryan 
+
+# bryan

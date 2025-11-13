@@ -71,30 +71,43 @@ def text_to_hex(user):
 # Binary → Text
 def binary_to_text(user):
     try:
-        if not isinstance(user, str): 
-            # Checks that the input is a string of 0s and 1s
+        if not isinstance(user, str):
             return "Error: Input must be a string of binary values."
-        if not user or user.isspace(): 
-            # Checks for blank or whitespace input
+        if not user or user.isspace():
             return "Error: Please enter something, not just spaces."
 
-        cleaned = user.replace(" ", "")  
-        # Removes spaces for counting the total bits
-        if len(cleaned) % 8 == 0 and " " not in user.strip():  
-            # Detects missing spaces between binary groups
-            return "Error: Missing spaces between binary codes (e.g. '01001000 01101001')."
+        cleaned = user.replace(" ", "")
 
-        text = ""  # stores result variable for converted text
-        binary_values = user.split()  # splits binary input by spaces
-        for binary in binary_values:
-            decimal_value = int(binary, 2)  # converts binary to decimal
-            text += chr(decimal_value)  # converts decimal to character
+        #  Must be at least 8 bits
+        if len(cleaned) < 8:
+            return "Error: Need at least 8 bits."
+
+        # N If total bits > 8, require spaces
+        if len(cleaned) > 8 and " " not in user.strip():
+            return "Error: Missing spaces between bytes (e.g. '01000001 01000010')."
+
+        # If exactly 8 bits, allow no spaces
+        if len(cleaned) == 8:
+            user = cleaned   # replace input with the clean single byte
+
+        # Now normal grouped validation
+        if len(cleaned) % 8 != 0:
+            return "Error: Total bit length must be a multiple of 8."
+
+        text = ""
+        for b in user.split():
+            if len(b) != 8:
+                return "Error: Each group must be 8 bits."
+            decimal_value = int(b, 2)
+            text += chr(decimal_value)
+
         return text
+
     except ValueError:
-        # Handles invalid binary inputs
         return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
     except Exception:
         return "Error: Something went wrong while converting binary to text."
+
 
 
 # Binary → Unicode/ASCII
@@ -106,18 +119,33 @@ def binary_to_unicode(user):
             return "Error: Please enter something, not just spaces."
 
         cleaned = user.replace(" ", "")
-        if len(cleaned) % 8 == 0 and " " not in user.strip():
-            # Same check for missing spaces
-            return "Error: Missing spaces between binary codes (e.g. '01001000 01101001')."
 
-        number_list = []  # stores decimal numbers
+        if len(cleaned) < 8:
+            return "Error: Need at least 8 bits."
+
+        #  allow single byte without spaces
+        if len(cleaned) > 8 and " " not in user.strip():
+            return "Error: Missing spaces between bytes (e.g. '01000001 01000010')."
+
+        if len(cleaned) == 8:
+            user = cleaned
+
+        if len(cleaned) % 8 != 0:
+            return "Error: Total bit length must be a multiple of 8."
+
+        number_list = []
         for b in user.split():
-            number_list.append(int(b, 2))  # converts binary to decimal
+            if len(b) != 8:
+                return "Error: Each group must be 8 bits."
+            number_list.append(int(b, 2))
+
         return number_list
+
     except ValueError:
         return "Error: Make sure you only enter valid binary numbers (0s and 1s)"
     except Exception:
         return "Error: Something went wrong while converting binary to Unicode."
+
 
 
 # Binary → Hexadecimal
@@ -129,14 +157,28 @@ def binary_to_hex(user):
             return "Error: Please enter something, not just spaces."
 
         cleaned = user.replace(" ", "")
-        if len(cleaned) % 8 == 0 and " " not in user.strip():
-            return "Error: Missing spaces between binary codes (e.g. '01001000 01101001')."
+
+        if len(cleaned) < 8:
+            return "Error: Need at least 8 bits."
+
+        if len(cleaned) > 8 and " " not in user.strip():
+            return "Error: Missing spaces between bytes (e.g. '01000001 01000010')."
+
+        if len(cleaned) == 8:
+            user = cleaned
+
+        if len(cleaned) % 8 != 0:
+            return "Error: Total bit length must be a multiple of 8."
 
         hex_list = []
         for b in user.split():
-            decimal_value = int(b, 2)  # binary → decimal
-            hex_list.append(format(decimal_value, 'X'))  # decimal → hex
+            if len(b) != 8:
+                return "Error: Each group must be 8 bits."
+            decimal_value = int(b, 2)
+            hex_list.append(format(decimal_value, 'X'))
+
         return hex_list
+
     except ValueError:
         return "Error: Make sure you only enter valid binary numbers (0s and 1s)"
     except Exception:

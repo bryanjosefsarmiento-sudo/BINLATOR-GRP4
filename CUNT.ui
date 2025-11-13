@@ -103,17 +103,17 @@ QComboBox:focus {
     </item>
     <item>
      <property name="text">
-      <string>Binary - Text</string>
+      <string>Binary (ASCII Bytes) - Text</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Binary - Unicode/ASCII</string>
+      <string>Binary (ASCII Bytes) - Unicode/ASCII</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Binary - Hexadecimal</string>
+      <string>Binary (ASCII Bytes) - Hexadecimal</string>
      </property>
     </item>
     <item>
