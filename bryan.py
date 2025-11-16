@@ -17,6 +17,8 @@ def text_to_unicode(user):
         if not user or user.isspace(): 
             # Checks if the user entered something (not empty or just spaces)
             return "Error: Please enter something, not just spaces."
+        
+        user = user.rstrip() # ignores trailing spaces
 
         unicode_list = []  # list to store Unicode/ASCII numbers/output
         for char in user:
@@ -37,6 +39,8 @@ def text_to_binary(user):
         if not user or user.isspace(): 
             # Prevents empty or whitespace-only inputs
             return "Error: Please enter something, not just spaces."
+        
+        user = user.rstrip() # ignores trailing spaces
 
         binary_result = ''  # empty string to store binary output
         for char in user:
@@ -45,6 +49,24 @@ def text_to_binary(user):
         return binary_result.strip()  # Removes the last extra space
     except Exception:
         return "Error: Something went wrong while converting text to binary."
+    
+# Text → Octal (list of octal strings, no 0o prefix)
+def text_to_octal(user):
+    try:
+        if not isinstance(user, str):
+            return "Error: Input must be a string."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+        
+        user = user.rstrip() # ignores trailing spaces
+
+        oct_list = []
+        for ch in user:
+            code = ord(ch)                 # Unicode code point
+            oct_list.append(format(code, "o"))  # to octal (no prefix)
+        return oct_list
+    except Exception:
+        return "Error: Something went wrong while converting text to octal."
 
 
 # Text → Hexadecimal
@@ -54,6 +76,8 @@ def text_to_hex(user):
             return "Error: Input must be a string."
         if not user or user.isspace(): 
             return "Error: Please enter something, not just spaces."
+        
+        user = user.rstrip()  # ignores trailing spaces
 
         hex_list = []  # list to store hexadecimal results
         for char in user:
@@ -146,6 +170,30 @@ def binary_to_unicode(user):
     except Exception:
         return "Error: Something went wrong while converting binary to Unicode."
 
+# Binary to Octal 
+def binary_to_octal(user):
+    try:
+        # If you added _auto_space_binary earlier, keep using it:
+        # user = _auto_space_binary(user)
+
+        if not isinstance(user, str):
+            return "Error: Input must be a string of binary values."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+        # simple 0/1/space check (same pattern as others)
+        for ch in user:
+            if ch not in ("0","1"," ", "\t", "\n", "\r"):
+                return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
+
+        out = []
+        for tok in user.split():
+            val = int(tok, 2)        # binary → decimal
+            out.append(format(val, "o"))  # decimal → octal
+        return out
+    except ValueError:
+        return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
+    except Exception:
+        return "Error: Something went wrong while converting binary to octal."
 
 
 # Binary → Hexadecimal
@@ -227,6 +275,24 @@ def unicode_to_binary(user):
         return "Error: Please enter valid decimal numbers."
     except Exception:
         return "Error: Something went wrong while converting Unicode to binary."
+    
+# Unicode/ASCII → Octal
+def unicode_to_octal(user):
+    try:
+        if not isinstance(user, str):
+            return "Error: Input must be a string of numbers."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+
+        out = []
+        for tok in user.split():
+            val = int(tok)            # string → int
+            out.append(format(val, "o"))  # decimal → octal
+        return out
+    except ValueError:
+        return "Error: Please enter valid decimal numbers."
+    except Exception:
+        return "Error: Something went wrong while converting decimal to octal."
 
 
 # Decimal (Unicode/ASCII) → Hexadecimal
@@ -305,3 +371,117 @@ def hex_to_binary(user):
         return "Error: Please enter valid hexadecimal values (0–9, A–F)."
     except Exception:
         return "Error: Something went wrong while converting hex to binary."
+    
+# Hexadecimal → Octal
+def hex_to_octal(user):
+    try:
+        if not isinstance(user, str):
+            return "Error: Input must be a string of hexadecimal values."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+
+        out = []
+        for tok in user.split():
+            val = int(tok, 16)        # hex → decimal
+            out.append(format(val, "o"))   # decimal → octal
+        return out
+    except ValueError:
+        return "Error: Please enter valid hexadecimal values (0–9, A–F)."
+    except Exception:
+        return "Error: Something went wrong while converting hexadecimal to octal."
+
+# ===========================
+# OCTAL-BASED MODES
+# ===========================
+
+# ===========================
+# OCTAL HELPERS
+# ===========================
+
+def _is_octal_or_space(s: str) -> bool:
+    """True only if s contains digits 0–7 and/or whitespace."""
+    for ch in s:
+        if ch not in ("0","1","2","3","4","5","6","7"," ", "\t", "\n", "\r"):
+            return False
+    return True
+
+# Octal → Text (space-separated octal code points)
+def octal_to_text(user):
+    try:
+        if not isinstance(user, str):
+            return "Error: Input must be a string of octal values."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+        if not _is_octal_or_space(user):
+            return "Error: Please add spaces to octal values (0–7)."
+
+        text = ""
+        tokens = user.split()  # each token is one code point in base 8
+        for tok in tokens:
+            val = int(tok, 8)   # octal → decimal (code point)
+            text += chr(val)    # decimal → character
+        return text
+    except ValueError:
+        return "Error: Please enter valid octal values (0–7)."
+    except Exception:
+        return "Error: Something went wrong while converting octal to text."
+    
+# Octal → Binary (8-bit padded per code point)
+def octal_to_binary(user):
+    try:
+        if not isinstance(user, str):
+            return "Error: Input must be a string of octal values."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+        if not _is_octal_or_space(user):
+            return "Error: Please enter valid octal values (0–7)."
+
+        out = []
+        for bry in user.split():
+            val = int(bry, 8)               # octal → decimal
+            out.append(format(val, "08b"))  # decimal → 8-bit binary
+        return out
+    except ValueError:
+        return "Error: Please enter valid octal values (0–7)."
+    except Exception:
+        return "Error: Something went wrong while converting octal to binary."
+    
+
+# Octal → Unicode/ASCII
+def octal_to_unicode(user):
+    try:
+        if not isinstance(user, str):
+            return "Error: Input must be a string of octal values."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+        if not _is_octal_or_space(user):
+            return "Error: Please enter valid octal values (0–7)."
+
+        out = []
+        for tok in user.split():
+            out.append(int(tok, 8))  # octal → decimal
+        return out
+    except ValueError:
+        return "Error: Please enter valid octal values (0–7)."
+    except Exception:
+        return "Error: Something went wrong while converting octal to decimal."
+    
+# Octal → Hexadecimal (uppercase, no 0x)
+def octal_to_hex(user):
+    try:
+        if not isinstance(user, str):
+            return "Error: Input must be a string of octal values."
+        if not user or user.isspace():
+            return "Error: Please enter something, not just spaces."
+        if not _is_octal_or_space(user):
+            return "Error: Please enter valid octal values (0–7)."
+
+        out = []
+        for tok in user.split():
+            val = int(tok, 8)           # octal → decimal
+            out.append(format(val, "X"))  # decimal → HEX uppercase
+        return out
+    except ValueError:
+        return "Error: Please enter valid octal values (0–7)."
+    except Exception:
+        return "Error: Something went wrong while converting octal to hexadecimal."

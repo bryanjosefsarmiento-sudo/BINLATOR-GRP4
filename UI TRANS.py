@@ -3,7 +3,7 @@ import sys
 import re  # <-- used by normalize_mode
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QPushButton, QComboBox,
-    QTextEdit, QMessageBox, QTextBrowser
+    QTextEdit, QMessageBox, QTextBrowser, QLabel
 )
 from PyQt5.QtGui import QIcon
 from PyQt5 import uic
@@ -37,7 +37,6 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
         self.setWindowIcon(QIcon("Logo.jpg"))    # Set window icon 
 
         #  Connect Python to widgets made in Qt Designer 
-        # Find each widget by its "objectName" (set in Qt Designer)
         self.combo: QComboBox = self.findChild(QComboBox, "comboBox")        # Dropdown menu
         self.text_1: QTextEdit = self.findChild(QTextEdit, "textEdit")       # Input text box
         self.text_2: QTextBrowser = self.findChild(QTextBrowser, "textBrowser")  # Output box
@@ -45,61 +44,129 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
         self.clear_button: QPushButton = self.findChild(QPushButton, "pushButton_2")  # Clear button
         self.copy_button: QPushButton = self.findChild(QPushButton, "pushButton_3")   # Copy Output button
 
+        # --- Sample Input label under the input box ---
+        self.sample_label: QLabel = QLabel(self)
+        self.sample_label.setObjectName("sampleLabel")
+        self.sample_label.setStyleSheet("color: rgb(255, 105, 180); font: 13pt 'Times New Roman';")
+        self.sample_label.setText("")
+        if self.text_1:
+            g = self.text_1.geometry()
+            self.sample_label.setGeometry(g.x(), g.y() + g.height() + 5, g.width(), 24)
+        self.sample_label.hide()
+
         #  Connect buttons to their corresponding functions 
         self.trans_button.clicked.connect(self.translate)  # Runs translate() when clicked
         self.clear_button.clicked.connect(self.clear)      # Runs clear() when clicked
-        if self.copy_button:  # Check if copy button exists in the UI
-            self.copy_button.clicked.connect(self.copy_output)  # Runs copy_output() when clicked
+        if self.copy_button:
+            self.copy_button.clicked.connect(self.copy_output)
+
+        # When mode changes, update the sample hint
+        if self.combo:
+            self.combo.currentTextChanged.connect(self.update_sample_hint)
 
         #  Dictionary linking dropdown modes to backend functions 
         self.fn_map = {
             "Text - Unicode/ASCII": bryan.text_to_unicode,
             "Text - Binary": bryan.text_to_binary,
+            "Text - Octal": bryan.text_to_octal,
             "Text - Hexadecimal": bryan.text_to_hex,
 
             "Binary (ASCII Bytes) - Text": bryan.binary_to_text,
             "Binary (ASCII Bytes) - Unicode/ASCII": bryan.binary_to_unicode,
+            "Binary (ASCII Bytes) - Octal": bryan.binary_to_octal,
             "Binary (ASCII Bytes) - Hexadecimal": bryan.binary_to_hex,
 
             "Unicode/ASCII - Text": bryan.unicode_to_text,
             "Unicode/ASCII - Binary": bryan.unicode_to_binary,
-            "Unicode/ASCII - Hexadecimal": bryan.decimal_to_hex,   
+            "Unicode/ASCII - Octal": bryan.unicode_to_octal,
+            "Unicode/ASCII - Hexadecimal": bryan.decimal_to_hex,
+
+            "Octal - Text": bryan.octal_to_text,
+            "Octal - Binary": bryan.octal_to_binary,
+            "Octal - Unicode/ASCII": bryan.octal_to_unicode,
+            "Octal - Hexadecimal": bryan.octal_to_hex,
 
             "Hexadecimal - Text": bryan.hex_to_text,
-            "Hexadecimal - Unicode/ASCII": bryan.hex_to_decimal,   
+            "Hexadecimal - Unicode/ASCII": bryan.hex_to_decimal,
+            "Hexadecimal - Octal": bryan.hex_to_octal,
             "Hexadecimal - Binary": bryan.hex_to_binary,
         }
 
         # Build a normalized lookup so small spacing/dash differences don’t break things
         self.fn_map_norm = {normalize_mode(k): v for k, v in self.fn_map.items()}
 
+        # Initialize sample hint text based on current combo value
+        self.update_sample_hint()
+
+    # -----------------------------
+    # Sample hint updater
+    # -----------------------------
+    def update_sample_hint(self, _=None):
+        """Show a 'Sample Input:' hint under the Input box based on the selected mode."""
+        if not (self.combo and self.sample_label):
+            return
+
+        mode = normalize_mode(self.combo.currentText())
+
+        examples = {
+            "Text - Unicode/ASCII": "Sample Input: Hi!  →  72 105 33",
+            "Text - Binary": "Sample Input: Hi  →  01001000 01101001",
+            "Text - Octal": "Sample Input: Hi  →  110 151",
+            "Text - Hexadecimal": "Sample Input: Hi  →  48 69",
+
+            "Binary (ASCII Bytes) - Text": "Sample Input: 01001000 01101001  →  Hi",
+            "Binary (ASCII Bytes) - Unicode/ASCII": "Sample Input: 01001000 01101001  →  72 105",
+            "Binary (ASCII Bytes) - Octal": "Sample Input: 01001000 01101001  →  110 151",
+            "Binary (ASCII Bytes) - Hexadecimal": "Sample Input: 01001000 01101001  →  48 69",
+
+            "Unicode/ASCII - Text": "Sample Input: 72 105  →  Hi",
+            "Unicode/ASCII - Binary": "Sample Input: 72 105  →  01001000 01101001",
+            "Unicode/ASCII - Octal": "Sample Input: 72 105  →  110 151",
+            "Unicode/ASCII - Hexadecimal": "Sample Input: 72 105  →  48 69",
+
+            "Octal - Text": "Sample Input: 110 151  →  Hi",
+            "Octal - Binary": "Sample Input: 110 151  →  01001000 01101001",
+            "Octal - Unicode/ASCII": "Sample Input: 110 151  →  72 105",
+            "Octal - Hexadecimal": "Sample Input: 110 151  →  48 69",
+
+            "Hexadecimal - Text": "Sample Input: 48 69 21  →  Hi!",
+            "Hexadecimal - Unicode/ASCII": "Sample Input: 48 69  →  72 105",
+            "Hexadecimal - Octal": "Sample Input: 48 69  →  110 151",
+            "Hexadecimal - Binary": "Sample Input: 48 69  →  01001000 01101001",
+        }
+
+        text = examples.get(mode, "")
+
+        if text:
+            self.sample_label.setText(text)
+            if self.text_1:
+                g = self.text_1.geometry()
+                self.sample_label.setGeometry(g.x(), g.y() + g.height() + 5, g.width(), 24)
+            self.sample_label.show()
+        else:
+            self.sample_label.hide()
+
     # -----------------------------
     # UI helper: group binary input
     # -----------------------------
     def _group_binary_8(self, raw: str):
         """
-        Take whatever is in the input box and:
-          1) keep only 0 and 1 (ignore spaces/other chars),
-          2) ensure total length is a multiple of 8,
-          3) return a string grouped into 8-bit chunks separated by spaces,
-             e.g. "0100100001101001" -> "01001000 01101001".
-        Returns None if invalid (backend will handle errors later).
+        Binary helper:
+          1) keep only 0 and 1,
+          2) require length % 8 == 0,
+          3) return 'xxxxxxxx xxxxxxxx ...' (8-bit groups) or None.
         """
         if raw is None:
             return None
 
-        # (1) Keep only '0' and '1' — ignore any spaces the user added.
         cleaned = ""
         for ch in raw:
             if ch == "0" or ch == "1":
                 cleaned += ch
-            # ignore spaces or any other characters, we don't keep them
 
-        # (2) Must be non-empty and a multiple of 8 (1 byte per character)
         if len(cleaned) == 0 or (len(cleaned) % 8) != 0:
-            return None  # let the backend raise a user-friendly error message
+            return None
 
-        # (3) Build 8-bit groups using a simple counter 
         groups = []
         current = ""
         for bit in cleaned:
@@ -108,10 +175,9 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
                 groups.append(current)
                 current = ""
 
-        if current:  # shouldn't happen if len % 8 == 0, but be safe
+        if current:
             return None
 
-        # Join groups with single spaces
         grouped = ""
         i = 0
         while i < len(groups):
@@ -122,61 +188,142 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
 
         return grouped
 
+    # -----------------------------
+    # UI helper: group octal input
+    # -----------------------------
+    def _group_octal_3(self, raw: str):
+        """
+        Octal helper:
+          1) keep only digits 0–7,
+          2) require length % 3 == 0,
+          3) return 'xxx xxx ...' (3-digit octal groups) or None.
+        Example: '110151' -> '110 151'
+        """
+        if raw is None:
+            return None
+
+        cleaned = ""
+        for ch in raw:
+            if ch in "01234567":
+                cleaned += ch
+
+        if len(cleaned) == 0 or (len(cleaned) % 3) != 0:
+            return None
+
+        groups = []
+        current = ""
+        for ch in cleaned:
+            current += ch
+            if len(current) == 3:
+                groups.append(current)
+                current = ""
+
+        if current:
+            return None
+
+        grouped = ""
+        i = 0
+        while i < len(groups):
+            grouped += groups[i]
+            if i != len(groups) - 1:
+                grouped += " "
+            i += 1
+
+        return grouped
+
+    # -----------------------------
+    # UI helper: normalize decimal codes (Unicode/ASCII input)
+    # -----------------------------
+    def _normalize_decimal_codes(self, raw: str):
+        """
+        Unicode/ASCII helper:
+
+        - Keep only digits, spaces, commas, semicolons.
+        - Turn commas/semicolons into spaces.
+        - Collapse multiple spaces.
+        Example:
+            '72,105;  33'  -> '72 105 33'
+        We do NOT try to guess splits like '72105' -> backend will show error.
+        """
+        if raw is None:
+            return ""
+
+        # Replace commas/semicolons with spaces
+        temp = ""
+        for ch in raw:
+            if ch.isdigit():
+                temp += ch
+            elif ch in [",", ";"]:
+                temp += " "
+            elif ch.isspace():
+                temp += " "
+            # ignore any weird characters
+
+        # Collapse multiple spaces
+        temp = temp.strip()
+        temp = re.sub(r"\s+", " ", temp)
+        return temp
+
     #  Function: Clear the interface 
     def clear(self):
-        # Clears all text fields and resets the dropdown
         if self.text_1:
-            self.text_1.setPlainText("")  # Clear the input box
+            self.text_1.setPlainText("")
         if self.text_2:
-            self.text_2.setPlainText("")  # Clear the output box
+            self.text_2.setPlainText("")
         if self.combo:
-            self.combo.setCurrentIndex(0)  # Reset dropdown to first option
+            self.combo.setCurrentIndex(0)
+        self.update_sample_hint()
 
     #  Function: Copy output to clipboard 
     def copy_output(self):
-        # Copies whatever text is currently displayed in the output box
         if not self.text_2:
             QMessageBox.warning(self, "Copy Failed", "Output box not found.")
             return
 
-        text = self.text_2.toPlainText()  # Extract text from output box
-        if not text.strip():  # If output is empty or only spaces
+        text = self.text_2.toPlainText()
+        if not text.strip():
             QMessageBox.warning(self, "Nothing to Copy", "There’s no translated output yet.")
             return
 
-        QApplication.clipboard().setText(text)  # Copy text to clipboard
+        QApplication.clipboard().setText(text)
         QMessageBox.information(self, "Copied!", "Translated output copied to clipboard!")
 
     #  Function: Handle the translation process 
     def translate(self):
-        # Make sure all widgets exist
         if not (self.combo and self.text_1 and self.text_2):
             QMessageBox.critical(self, "Error", "UI elements not found (check objectNames in the .ui).")
             return
 
-        # Get the selected translation mode from the dropdown, normalized
         mode_raw = self.combo.currentText()
         mode = normalize_mode(mode_raw)
-        if mode.lower() == "select" or not mode:  # If user didn’t pick anything
+        if mode.lower() == "select" or not mode:
             QMessageBox.information(self, "Pick a mode", "Please pick a mode of translation.")
             return
 
-        # Get whatever text the user typed in the input box
         user_input = self.text_1.toPlainText()
 
-        # ✅ AUTO-SPACING STEP (UI-side convenience, backend unchanged)
-        # Only do this when the selected mode is one of the Binary modes.
+        # AUTO-SPACING / AUTO-CLEAN STEP (UI-side convenience)
         if mode.startswith("Binary"):
             grouped = self._group_binary_8(user_input)
             if grouped is not None:
-                # Update the input box to the neatly spaced 8-bit form so the user sees it.
                 self.text_1.setPlainText(grouped)
                 user_input = grouped
-            # If grouped is None, we leave the input as-is; backend will return a clear error.
+
+        elif mode.startswith("Octal"):
+            grouped = self._group_octal_3(user_input)
+            if grouped is not None:
+                self.text_1.setPlainText(grouped)
+                user_input = grouped
+
+        elif mode.startswith("Unicode/ASCII"):
+            normalized = self._normalize_decimal_codes(user_input)
+            if normalized:
+                self.text_1.setPlainText(normalized)
+                user_input = normalized
 
         # Look up the correct backend function based on dropdown choice (normalized)
         func = self.fn_map_norm.get(mode)
-        if func is None:  # If mode isn’t found in the dictionary
+        if func is None:
             QMessageBox.warning(
                 self,
                 "Pick a mode",
@@ -186,41 +333,35 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
 
         # Try running the backend function safely
         try:
-            result = func(user_input)  # Pass user input to backend function
+            result = func(user_input)
         except Exception as e:
             QMessageBox.critical(self, "Unexpected Error", f"An unexpected error occurred:\n{e}")
             return
 
-        # If backend returns an "Error:" message
+        # If backend returns an "Error: ..." message
         if isinstance(result, str) and result.startswith("Error:"):
             QMessageBox.warning(self, "Input Error", result)
-            self.text_2.setPlainText("")  # Clear the output box
+            self.text_2.setPlainText("")
             return
 
-        #  Display the result in the output box 
+        # Display the result in the output box 
         if isinstance(result, list):
-            # If backend returns a list (like [65, 66, 67])
-            pretty = " ".join(str(x) for x in result)  # Convert to string "65 66 67"
+            pretty = " ".join(str(x) for x in result)
             self.text_2.setPlainText(pretty)
         elif isinstance(result, str):
-            # If backend returns a normal string
             self.text_2.setPlainText(result)
         else:
-            # For anything else (just convert to string)
             self.text_2.setPlainText(str(result))
 
 
 #  Main entry point of the program 
 def main():
-    app = QApplication(sys.argv)  # Start the Qt application
-    window = MainWindow()         # Create the main window
-    window.show()                 # Show the main window on screen
-    sys.exit(app.exec_())         # Run the app until closed
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
 
 
 #  Only runs this if file is executed directly 
 if __name__ == "__main__":
     main()
-
-
-# bryan

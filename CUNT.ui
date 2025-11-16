@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1006</width>
-    <height>589</height>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <property name="geometry">
      <rect>
       <x>610</x>
-      <y>410</y>
-      <width>111</width>
+      <y>470</y>
+      <width>131</width>
       <height>31</height>
      </rect>
     </property>
@@ -98,6 +98,11 @@ QComboBox:focus {
     </item>
     <item>
      <property name="text">
+      <string>Text - Octal</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Text - Hexadecimal</string>
      </property>
     </item>
@@ -109,6 +114,11 @@ QComboBox:focus {
     <item>
      <property name="text">
       <string>Binary (ASCII Bytes) - Unicode/ASCII</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Binary (ASCII Bytes) - Octal</string>
      </property>
     </item>
     <item>
@@ -133,6 +143,31 @@ QComboBox:focus {
     </item>
     <item>
      <property name="text">
+      <string>Unicode/ASCII - Octal</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Octal - Text</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Octal - Binary</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Octal - Unicode/ASCII</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Octal - Hexadecimal</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Hexadecimal - Text</string>
      </property>
     </item>
@@ -146,12 +181,17 @@ QComboBox:focus {
       <string>Hexadecimal - Unicode/ASCII</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>Hexadecimal - Octal</string>
+     </property>
+    </item>
    </widget>
    <widget class="QTextEdit" name="textEdit">
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>160</y>
+      <y>170</y>
       <width>581</width>
       <height>81</height>
      </rect>
@@ -178,9 +218,9 @@ QTextEdit:focus {
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>460</y>
-      <width>161</width>
-      <height>28</height>
+      <y>520</y>
+      <width>171</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -263,7 +303,8 @@ font: 13pt &quot;Times New Roman&quot;;</string>
     <property name="styleSheet">
      <string notr="true">color: rgb(255, 70, 166);
 
-font: 13pt &quot;Times New Roman&quot;;</string>
+font: 13pt &quot;Times New Roman&quot;;
+</string>
     </property>
     <property name="text">
      <string>Input</string>
@@ -273,7 +314,7 @@ font: 13pt &quot;Times New Roman&quot;;</string>
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>250</y>
+      <y>320</y>
       <width>231</width>
       <height>31</height>
      </rect>
@@ -291,7 +332,7 @@ font: 13pt &quot;Times New Roman&quot;;</string>
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>280</y>
+      <y>350</y>
       <width>581</width>
       <height>81</height>
      </rect>
@@ -336,7 +377,7 @@ font: 35pt &quot;Times New Roman&quot;;</string>
     <property name="geometry">
      <rect>
       <x>840</x>
-      <y>380</y>
+      <y>450</y>
       <width>131</width>
       <height>31</height>
      </rect>
