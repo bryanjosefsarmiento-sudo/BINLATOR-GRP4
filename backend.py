@@ -18,16 +18,32 @@ def text_to_unicode(user):
             # Checks if the user entered something (not empty or just spaces)
             return "Error: Please enter something, not just spaces."
         
-        user = user.rstrip() # ignores trailing spaces
+        
+        user = user.strip()  # removes leading/trailing spaces
+        user = " ".join(user.split()) # collapses multiple spaces into one
+
+        chars_only = [c for c in user if not c.isspace()]
+        # Collect all letters only, ignore spaces
+        space_count = sum(1 for c in user if c.isspace())
+        # Count how many spaces there are
+        if len(chars_only) >= 2 and space_count == len(chars_only) - 1:
+            # Check if the input looks like "H e l l o"
+            user = "".join(chars_only)   
+
+        # Collapse any remaining multiple spaces inside to a single space
+        user = " ".join(user.split())
+        # --- END NEW PART ---
 
         unicode_list = []  # list to store Unicode/ASCII numbers/output
-        for char in user:
-            unicode_list.append(ord(char)) 
+        for jhaila in user:
+            unicode_list.append(ord(jhaila)) 
             # 'ord()' converts each character to its Unicode/ASCII value
         return unicode_list
     except Exception:
         # Catches any unexpected error
         return "Error: Something went wrong while converting text to Unicode."
+
+
 
 
 # Text → Binary
@@ -39,9 +55,18 @@ def text_to_binary(user):
         if not user or user.isspace(): 
             # Prevents empty or whitespace-only inputs
             return "Error: Please enter something, not just spaces."
-        
-        user = user.rstrip() # ignores trailing spaces
 
+        user = user.strip()  # removes leading/trailing spaces
+        user = " ".join(user.split()) # collapses multiple spaces into one
+
+        chars_only = [c for c in user if not c.isspace()]
+        # Collect all letters only, ignore spaces
+        space_count = sum(1 for c in user if c.isspace())
+        # Count how many spaces there are
+        if len(chars_only) >= 2 and space_count == len(chars_only) - 1:
+            # Check if the input looks like "H e l l o"
+            user = "".join(chars_only)   
+        
         binary_result = ''  # empty string to store binary output
         for char in user:
             binary_result += format(ord(char), '08b') + ' ' 
@@ -49,16 +74,28 @@ def text_to_binary(user):
         return binary_result.strip()  # Removes the last extra space
     except Exception:
         return "Error: Something went wrong while converting text to binary."
+
     
 # Text → Octal (list of octal strings, no 0o prefix)
 def text_to_octal(user):
     try:
         if not isinstance(user, str):
+            # Ensures input is a string
             return "Error: Input must be a string."
         if not user or user.isspace():
+            # Prevents empty or whitespace-only input
             return "Error: Please enter something, not just spaces."
-        
-        user = user.rstrip() # ignores trailing spaces
+
+        user = user.strip()  # removes leading/trailing spaces
+        user = " ".join(user.split()) # collapses multiple spaces into one
+
+        chars_only = [c for c in user if not c.isspace()]
+        # Collect all letters only, ignore spaces
+        space_count = sum(1 for c in user if c.isspace())
+        # Count how many spaces there are
+        if len(chars_only) >= 2 and space_count == len(chars_only) - 1:
+            # Check if the input looks like "H e l l o"
+            user = "".join(chars_only)   
 
         oct_list = []
         for ch in user:
@@ -69,16 +106,28 @@ def text_to_octal(user):
         return "Error: Something went wrong while converting text to octal."
 
 
+
 # Text → Hexadecimal
 def text_to_hex(user):
     try:
         if not isinstance(user, str): 
+            # Ensures input is a string
             return "Error: Input must be a string."
         if not user or user.isspace(): 
+            # Prevents empty or whitespace-only inputs
             return "Error: Please enter something, not just spaces."
-        
-        user = user.rstrip()  # ignores trailing spaces
 
+        user = user.strip()  # removes leading/trailing spaces
+        user = " ".join(user.split()) # collapses multiple spaces into one
+
+        chars_only = [c for c in user if not c.isspace()]
+        # Collect all letters only, ignore spaces
+        space_count = sum(1 for c in user if c.isspace())
+        # Count how many spaces there are
+        if len(chars_only) >= 2 and space_count == len(chars_only) - 1:
+            # Check if the input looks like "H e l l o"
+            user = "".join(chars_only)   
+        
         hex_list = []  # list to store hexadecimal results
         for char in user:
             hex_list.append(format(ord(char), 'X')) 
@@ -86,6 +135,7 @@ def text_to_hex(user):
         return hex_list
     except Exception:
         return "Error: Something went wrong while converting text to hexadecimal."
+
 
 
 # ===========================
@@ -185,11 +235,11 @@ def binary_to_octal(user):
             if ch not in ("0","1"," ", "\t", "\n", "\r"):
                 return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
 
-        out = []
+        jef = []
         for tok in user.split():
-            val = int(tok, 2)        # binary → decimal
-            out.append(format(val, "o"))  # decimal → octal
-        return out
+            jhaila = int(tok, 2)        # binary → decimal
+            jef.append(format(jhaila, "o"))  # decimal → octal
+        return jef
     except ValueError:
         return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
     except Exception:
@@ -268,7 +318,7 @@ def unicode_to_binary(user):
 
         binary_list = []
         for code in user.split():
-            number = int(code)  # converts text to number
+            number = int(code)  # converts string to number
             binary_list.append(format(number, '08b'))  # converts to binary
         return binary_list
     except ValueError:

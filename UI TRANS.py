@@ -9,7 +9,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5 import uic
 
 # Import your backend file that contains all the conversion functions 
-import bryan as bryan
+import backend as backend
 
 
 def normalize_mode(s: str) -> str:
@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
         super().__init__()
 
         # Load the .ui file (created using Qt Designer)
-        uic.loadUi("CUNT.ui", self)
+        uic.loadUi("BIN UI.ui", self)
         self.setWindowTitle("BINLATOR")          # Set window title
         self.setWindowIcon(QIcon("Logo.jpg"))    # Set window icon 
 
@@ -66,30 +66,35 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
 
         #  Dictionary linking dropdown modes to backend functions 
         self.fn_map = {
-            "Text - Unicode/ASCII": bryan.text_to_unicode,
-            "Text - Binary": bryan.text_to_binary,
-            "Text - Octal": bryan.text_to_octal,
-            "Text - Hexadecimal": bryan.text_to_hex,
+            # Text Based Translations
+            "Text - Unicode/ASCII": backend.text_to_unicode,
+            "Text - Binary": backend.text_to_binary,
+            "Text - Octal": backend.text_to_octal,
+            "Text - Hexadecimal": backend.text_to_hex,
 
-            "Binary (ASCII Bytes) - Text": bryan.binary_to_text,
-            "Binary (ASCII Bytes) - Unicode/ASCII": bryan.binary_to_unicode,
-            "Binary (ASCII Bytes) - Octal": bryan.binary_to_octal,
-            "Binary (ASCII Bytes) - Hexadecimal": bryan.binary_to_hex,
+            # Binary Based translations
+            "Binary (ASCII Bytes) - Text": backend.binary_to_text,
+            "Binary (ASCII Bytes) - Unicode/ASCII": backend.binary_to_unicode,
+            "Binary (ASCII Bytes) - Octal": backend.binary_to_octal,
+            "Binary (ASCII Bytes) - Hexadecimal": backend.binary_to_hex,
 
-            "Unicode/ASCII - Text": bryan.unicode_to_text,
-            "Unicode/ASCII - Binary": bryan.unicode_to_binary,
-            "Unicode/ASCII - Octal": bryan.unicode_to_octal,
-            "Unicode/ASCII - Hexadecimal": bryan.decimal_to_hex,
+            # Unicode/ASCII Based Translations
+            "Unicode/ASCII - Text": backend.unicode_to_text,
+            "Unicode/ASCII - Binary": backend.unicode_to_binary,
+            "Unicode/ASCII - Octal": backend.unicode_to_octal,
+            "Unicode/ASCII - Hexadecimal": backend.decimal_to_hex,
 
-            "Octal - Text": bryan.octal_to_text,
-            "Octal - Binary": bryan.octal_to_binary,
-            "Octal - Unicode/ASCII": bryan.octal_to_unicode,
-            "Octal - Hexadecimal": bryan.octal_to_hex,
+            # Octal Based Translations
+            "Octal - Text": backend.octal_to_text,
+            "Octal - Binary": backend.octal_to_binary,
+            "Octal - Unicode/ASCII": backend.octal_to_unicode,
+            "Octal - Hexadecimal": backend.octal_to_hex,
 
-            "Hexadecimal - Text": bryan.hex_to_text,
-            "Hexadecimal - Unicode/ASCII": bryan.hex_to_decimal,
-            "Hexadecimal - Octal": bryan.hex_to_octal,
-            "Hexadecimal - Binary": bryan.hex_to_binary,
+            #Hexadecimal Based Translations
+            "Hexadecimal - Text": backend.hex_to_text,
+            "Hexadecimal - Unicode/ASCII": backend.hex_to_decimal,
+            "Hexadecimal - Octal": backend.hex_to_octal,
+            "Hexadecimal - Binary": backend.hex_to_binary,
         }
 
         # Build a normalized lookup so small spacing/dash differences don’t break things
