@@ -164,77 +164,62 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
         if raw is None:
             return None
 
+        # Keep only 0 and 1
         cleaned = ""
         for ch in raw:
             if ch == "0" or ch == "1":
                 cleaned += ch
 
-        if len(cleaned) == 0 or (len(cleaned) % 8) != 0:
+        # Validate length
+        if len(cleaned) == 0 or len(cleaned) % 8 != 0:
             return None
 
+        # Group into 8-bit 
         groups = []
-        current = ""
-        for bit in cleaned:
-            current += bit
-            if len(current) == 8:
-                groups.append(current)
-                current = ""
-
-        if current:
-            return None
-
-        grouped = ""
         i = 0
-        while i < len(groups):
-            grouped += groups[i]
-            if i != len(groups) - 1:
-                grouped += " "
-            i += 1
+        while i < len(cleaned):
+            group = cleaned[i:i+8]      # slice 8 bits
+            groups.append(group)        # add to list
+            i += 8                      # move forward to next 8 bits
 
-        return grouped
+        # Join groups with a space, like: "01001000 01101001"
+        return " ".join(groups)
 
     # -----------------------------
     # UI helper: group octal input
     # -----------------------------
+
     def _group_octal_3(self, raw: str):
         """
         Octal helper:
           1) keep only digits 0–7,
           2) require length % 3 == 0,
           3) return 'xxx xxx ...' (3-digit octal groups) or None.
-        Example: '110151' -> '110 151'
         """
         if raw is None:
             return None
 
+        # Keep only digits 0–7
         cleaned = ""
         for ch in raw:
             if ch in "01234567":
                 cleaned += ch
 
-        if len(cleaned) == 0 or (len(cleaned) % 3) != 0:
+        # Validate length
+        if len(cleaned) == 0 or len(cleaned) % 3 != 0:
             return None
 
+        # Group into 3-digit chunks
         groups = []
-        current = ""
-        for ch in cleaned:
-            current += ch
-            if len(current) == 3:
-                groups.append(current)
-                current = ""
-
-        if current:
-            return None
-
-        grouped = ""
         i = 0
-        while i < len(groups):
-            grouped += groups[i]
-            if i != len(groups) - 1:
-                grouped += " "
-            i += 1
+        while i < len(cleaned):
+            group = cleaned[i:i+3]   # slice 3 bits
+            groups.append(group)     # 
+            i += 3                   # move forward to next 3 bits
 
-        return grouped
+        # Join with spaces
+        return " ".join(groups)
+
 
     # -----------------------------
     # UI helper: normalize decimal codes (Unicode/ASCII input)
@@ -258,7 +243,7 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
         for ch in raw:
             if ch.isdigit():
                 temp += ch
-            elif ch in [",", ";"]:
+            elif ch in [",", ";" , ":"]:
                 temp += " "
             elif ch.isspace():
                 temp += " "

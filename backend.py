@@ -1,7 +1,7 @@
 # ==========================================================
 # BINLATOR Translation Functions
 # ==========================================================
-# TEST CHANGE 123
+
 
 
 # ===========================
@@ -32,7 +32,7 @@ def text_to_unicode(user):
 
         # Collapse any remaining multiple spaces inside to a single space
         user = " ".join(user.split())
-        # --- END NEW PART ---
+       
 
         unicode_list = []  # list to store Unicode/ASCII numbers/output
         for jhaila in user:
@@ -237,8 +237,10 @@ def binary_to_octal(user):
 
         jef = []
         for tok in user.split():
-            jhaila = int(tok, 2)        # binary → decimal
-            jef.append(format(jhaila, "o"))  # decimal → octal
+             if len(tok) != 8:
+                return "Error: Each group must be 8 bits."
+        jhaila = int(tok, 2)        # binary → decimal
+        jef.append(format(jhaila, "o"))  # decimal → octal
         return jef
     except ValueError:
         return "Error: Make sure you only enter valid binary numbers (0s and 1s)."

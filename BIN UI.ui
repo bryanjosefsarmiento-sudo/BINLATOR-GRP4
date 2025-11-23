@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1262</width>
-    <height>687</height>
+    <height>696</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -201,7 +201,7 @@ QComboBox:focus {
     background-color: #ffffff;
     color: #000000;
     font-family: &quot;Times New Roman&quot;;
-    font-size: 11pt;
+    font-size: 12pt;
     border: 2px solid #ff69b4;
     border-radius: 15px;
     padding: 6px;
@@ -342,7 +342,7 @@ font: 13pt &quot;Times New Roman&quot;;</string>
     background-color: #ffffff;
     color: #000000;
     font-family: &quot;Times New Roman&quot;;
-    font-size: 11pt;
+    font-size: 12pt;
     border: 2px solid #ff69b4;
     border-radius: 15px;
     padding: 6px;
