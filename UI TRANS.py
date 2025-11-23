@@ -243,16 +243,10 @@ class MainWindow(QMainWindow):  # Main window class (inherits from QMainWindow)
         for ch in raw:
             if ch.isdigit():
                 temp += ch
-            elif ch in [",", ";" , ":"]:
+            elif ch in [",", ";" , ":"] or ch.isspace():
                 temp += " "
-            elif ch.isspace():
-                temp += " "
-            # ignore any weird characters
-
-        # Collapse multiple spaces
-        temp = temp.strip()
-        temp = re.sub(r"\s+", " ", temp)
-        return temp
+        
+        return " ".join(temp.split())
 
     #  Function: Clear the interface 
     def clear(self):

@@ -209,10 +209,7 @@ def binary_to_unicode(user):
 
         number_list = []
         for b in user.split():
-            if len(b) != 8:
-                return "Error: Each group must be 8 bits."
             number_list.append(int(b, 2))
-
         return number_list
 
     except ValueError:
@@ -223,24 +220,34 @@ def binary_to_unicode(user):
 # Binary to Octal 
 def binary_to_octal(user):
     try:
-        # If you added _auto_space_binary earlier, keep using it:
-        # user = _auto_space_binary(user)
-
         if not isinstance(user, str):
             return "Error: Input must be a string of binary values."
         if not user or user.isspace():
             return "Error: Please enter something, not just spaces."
-        # simple 0/1/space check (same pattern as others)
-        for ch in user:
-            if ch not in ("0","1"," ", "\t", "\n", "\r"):
-                return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
+
+        cleaned = user.replace(" ", "")
+
+        #  Must be at least 8 bits
+        if len(cleaned) < 8:
+            return "Error: Need at least 8 bits."
+
+        # N If total bits > 8, require spaces
+        if len(cleaned) > 8 and " " not in user.strip():
+            return "Error: Missing spaces between bytes (e.g. '01000001 01000010')."
+
+        # If exactly 8 bits, allow no spaces
+        if len(cleaned) == 8:
+            user = cleaned   # replace input with the clean single byte
+
+        # Now normal grouped validation
+        if len(cleaned) % 8 != 0:
+            return "Error: Total bit length must be a multiple of 8."
+        
 
         jef = []
         for tok in user.split():
-             if len(tok) != 8:
-                return "Error: Each group must be 8 bits."
-        jhaila = int(tok, 2)        # binary → decimal
-        jef.append(format(jhaila, "o"))  # decimal → octal
+            jhaila = int(tok, 2)        # binary → decimal
+            jef.append(format(jhaila, "o"))  # decimal → octal
         return jef
     except ValueError:
         return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
@@ -339,7 +346,7 @@ def unicode_to_octal(user):
         out = []
         for tok in user.split():
             val = int(tok)            # string → int
-            out.append(format(val, "o"))  # decimal → octal
+            out.append(format(val, "o"))  # integer → octal
         return out
     except ValueError:
         return "Error: Please enter valid decimal numbers."
