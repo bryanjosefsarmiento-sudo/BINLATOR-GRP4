@@ -259,7 +259,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>240</y>
+      <y>300</y>
       <width>191</width>
       <height>71</height>
      </rect>
@@ -359,7 +359,7 @@ QTextBrowser:focus {
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>190</y>
+      <y>250</y>
       <width>301</width>
       <height>71</height>
      </rect>

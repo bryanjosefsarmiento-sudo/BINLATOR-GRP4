@@ -150,7 +150,13 @@ def binary_to_text(user):
         if not user or user.isspace():
             return "Error: Please enter something, not just spaces."
 
+        # removes the spaces in the input
         cleaned = user.replace(" ", "")
+
+        # checks if the inputs have 0's and 1's
+        for ch in cleaned:
+            if ch not in "01":
+                return "Error: Make sure you only enter valid  binary numbers (0's and  1's) "
 
         #  Must be at least 8 bits
         if len(cleaned) < 8:
@@ -170,15 +176,11 @@ def binary_to_text(user):
 
         text = ""
         for b in user.split():
-            if len(b) != 8:
-                return "Error: Each group must be 8 bits."
             decimal_value = int(b, 2)
             text += chr(decimal_value)
 
         return text
 
-    except ValueError:
-        return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
     except Exception:
         return "Error: Something went wrong while converting binary to text."
 
@@ -192,14 +194,17 @@ def binary_to_unicode(user):
         if not user or user.isspace():
             return "Error: Please enter something, not just spaces."
 
+        # removes  the space from the input
         cleaned = user.replace(" ", "")
+
+        # checks if the inputs have 0's and 1's
+        for ch in cleaned:
+            if ch is not "01":
+                return "Error: Make sure you only enter valid  binary numbers (0's and  1's) "
 
         if len(cleaned) < 8:
             return "Error: Need at least 8 bits."
 
-        #  allow single byte without spaces
-        if len(cleaned) > 8 and " " not in user.strip():
-            return "Error: Missing spaces between bytes (e.g. '01000001 01000010')."
 
         if len(cleaned) == 8:
             user = cleaned
@@ -212,8 +217,6 @@ def binary_to_unicode(user):
             number_list.append(int(b, 2))
         return number_list
 
-    except ValueError:
-        return "Error: Make sure you only enter valid binary numbers (0s and 1s)"
     except Exception:
         return "Error: Something went wrong while converting binary to Unicode."
 
@@ -224,8 +227,14 @@ def binary_to_octal(user):
             return "Error: Input must be a string of binary values."
         if not user or user.isspace():
             return "Error: Please enter something, not just spaces."
-
+        
+        # removes the spaces in the input
         cleaned = user.replace(" ", "")
+
+        # checks if the inputs have 0's and 1's
+        for ch in cleaned:
+            if ch is not "01":
+                return "Error: Make sure you only enter valid  binary numbers (0's and  1's) "
 
         #  Must be at least 8 bits
         if len(cleaned) < 8:
@@ -249,8 +258,7 @@ def binary_to_octal(user):
             jhaila = int(tok, 2)        # binary → decimal
             jef.append(format(jhaila, "o"))  # decimal → octal
         return jef
-    except ValueError:
-        return "Error: Make sure you only enter valid binary numbers (0s and 1s)."
+  
     except Exception:
         return "Error: Something went wrong while converting binary to octal."
 
@@ -262,8 +270,14 @@ def binary_to_hex(user):
             return "Error: Input must be a string of binary values."
         if not user or user.isspace():
             return "Error: Please enter something, not just spaces."
-
+        
+        # removes the spaces in the input
         cleaned = user.replace(" ", "")
+
+        # checks if the inputs have 0's and 1's
+        for ch in cleaned:
+            if ch is not "01":
+                return "Error: Make sure you only enter valid  binary numbers (0's and  1's) "
 
         if len(cleaned) < 8:
             return "Error: Need at least 8 bits."
@@ -311,6 +325,7 @@ def unicode_to_text(user):
         for code in number_list:
             result_text += chr(code)  # converts number to character
         return result_text
+    
     except ValueError:
         return "Error: Please enter valid decimal numbers (e.g. 65 66 67)."
     except Exception:
@@ -330,6 +345,8 @@ def unicode_to_binary(user):
             number = int(code)  # converts string to number
             binary_list.append(format(number, '08b'))  # converts to binary
         return binary_list
+    
+
     except ValueError:
         return "Error: Please enter valid decimal numbers."
     except Exception:
@@ -367,6 +384,8 @@ def decimal_to_hex(user):
             number = int(num)
             hex_list.append(format(number, 'X'))  # converts decimal to hex
         return hex_list
+    
+    
     except ValueError:
         return "Error: Please enter valid decimal numbers."
     except Exception:
